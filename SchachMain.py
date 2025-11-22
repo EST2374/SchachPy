@@ -1,10 +1,10 @@
 # Für User Input und UI
 import pygame as p
-
+import os
 import SchachEngine
 
 p.init()
-WIDTH = HEIGHT = 512
+WIDTH = HEIGHT = 512*2
 DIMNESION = 8  # Weil 8x8
 SQ_SIZE = HEIGHT // DIMNESION
 MAX_FPS = 15  # Für Animation
@@ -32,11 +32,24 @@ def loadImages():
         "bp",
     ]  # besser
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(
-            p.image.load("Figuren/" + piece + ".png"),
-            (SQ_SIZE, SQ_SIZE),
-        )
-
+        try:
+            image_path_png = os.path.join("Figuren_png/" + piece + ".png")
+            IMAGES[piece] = p.transform.scale(
+                p.image.load(image_path_png),
+                (SQ_SIZE, SQ_SIZE),
+            )
+        except p.error:
+            # Wenn das Laden der PNG fehlschlägt (z.B. Datei nicht gefunden), versuche die BMP-Version
+            print(f"Warnung: {image_path_png} konnte nicht geladen werden. Versuche stattdessen die BMP-Version.")
+            image_path_bmp = os.path.join("Figuren_bmp/" + piece + ".bmp")
+            try:
+                IMAGES[piece] = p.transform.scale(
+                    p.image.load(image_path_bmp),
+                    (SQ_SIZE, SQ_SIZE),
+                )
+            except p.error:
+                # Wenn auch die BMP fehlschlägt
+                print(f"Fehler: Weder {image_path_png} noch {image_path_bmp} konnten für {piece} geladen werden.")
 
 """
 Main Driver der User Input liest und Grafik updatet
